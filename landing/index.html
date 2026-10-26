@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AlertaPhishing: verifica antes de hacer clic</title>
+<meta name="description" content="Verifica enlaces, números de celular y cuentas interbancarias antes de caer en una estafa.">
+<style>
+  :root {
+    --ink: #12263a;
+    --muted: #4d6073;
+    --paper: #f3f6f8;
+    --card: #ffffff;
+    --line: #cfd9e1;
+    --ok: #1c7a52;
+    --warn: #a86f00;
+    --bad: #b8322a;
+    --bad-bg: #fbeceb;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 1.125rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  h1, h2 { font-family: Georgia, "Times New Roman", serif; line-height: 1.15; margin: 0 0 .6em; }
+  h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); max-width: 14ch; }
+  h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); }
+  p { margin: 0 0 1em; max-width: 62ch; }
+  a { color: var(--ink); }
+  a:focus-visible, .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .wrap { width: min(1080px, 100% - 2.5rem); margin-inline: auto; }
+  header { padding: 1.2rem 0; border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .brand { font-family: Georgia, serif; font-weight: bold; font-size: 1.3rem; text-decoration: none; }
+  nav a { margin-left: 1.4rem; text-decoration: none; color: var(--muted); }
+  nav a:hover { color: var(--ink); text-decoration: underline; }
+
+  .hero { padding: 3.5rem 0 4rem; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 3rem; align-items: center; }
+  .btn { display: inline-block; background: var(--ink); color: #fff; padding: .85rem 1.4rem; border-radius: 6px; text-decoration: none; font-weight: 600; }
+  .btn:hover { background: #1d3a57; }
+  .note { color: var(--muted); font-size: 1rem; margin-top: 1.2rem; }
+
+  .result { background: var(--card); border: 2px solid var(--bad); border-radius: 10px; padding: 1.4rem; }
+  .result small { color: var(--muted); display: block; }
+  .result .value { font-family: Consolas, "Courier New", monospace; font-size: 1.05rem; word-break: break-all; margin: .2rem 0 1rem; }
+  .verdict { background: var(--bad-bg); border-left: 8px solid var(--bad); padding: .8rem 1rem; }
+  .verdict strong { display: block; font-family: Georgia, serif; font-size: 1.8rem; color: var(--bad); line-height: 1.1; }
+  .verdict span { font-size: 1rem; }
+  .levels { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .5rem; font-size: 1rem; }
+  .levels li { display: flex; gap: .6rem; align-items: baseline; }
+  .dot { width: .8rem; height: .8rem; border-radius: 50%; flex: none; transform: translateY(.1rem); }
+
+  section { padding: 3.5rem 0; border-top: 1px solid var(--line); }
+  .steps { list-style: none; counter-reset: paso; padding: 0; margin: 1.6rem 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+  .steps li { counter-increment: paso; }
+  .steps li::before { content: counter(paso); display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--ink); color: #fff; font-weight: bold; margin-bottom: .8rem; }
+  .steps b { display: block; }
+  .what { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 1.6rem; }
+  .what div { border-top: 4px solid var(--ink); padding-top: .8rem; }
+  .what h3 { margin: 0 0 .3rem; font-size: 1.15rem; }
+  .what p { margin: 0; color: var(--muted); }
+  footer { background: var(--ink); color: #dbe5ec; padding: 2rem 0; font-size: 1rem; }
+  footer a { color: #fff; }
+
+  @media (max-width: 760px) {
+    .hero .wrap, .steps, .what { grid-template-columns: 1fr; }
+    .hero { padding-top: 2rem; }
+    nav a { margin: 0 1rem 0 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="#">AlertaPhishing</a>
+    <nav aria-label="Principal">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#que-verificar">Qué puedes verificar</a>
+      <a href="#familia">Familia</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Antes de hacer clic o transferir, verifica.</h1>
+        <p>Pega un enlace, un número de celular o una cuenta interbancaria. AlertaPhishing te dice si otras personas ya lo reportaron como fraude y qué hacer.</p>
+        <a class="btn" href="#como-funciona">Ver cómo funciona</a>
+        <p class="note">La aplicación móvil está en desarrollo. Este sitio presenta el proyecto.</p>
+      </div>
+      <div class="result" role="img" aria-label="Ejemplo: el enlace bcp-verificacion-segura.com aparece como peligroso, reportado como fraude">
+        <small>Ejemplo de resultado · enlace verificado</small>
+        <div class="value">bcp-verificacion-segura.com</div>
+        <div class="verdict">
+          <strong>Peligroso</strong>
+          <span>Este dato fue reportado como fraude. No hagas clic ni transfieras dinero.</span>
+        </div>
+        <ul class="levels">
+          <li><span class="dot" style="background:var(--ok)"></span><span><b>Seguro:</b> sin reportes. Aun así, verifica antes de actuar.</span></li>
+          <li><span class="dot" style="background:var(--warn)"></span><span><b>Sospechoso:</b> otros usuarios lo reportaron. Ten cuidado.</span></li>
+          <li><span class="dot" style="background:var(--bad)"></span><span><b>Peligroso:</b> reportado varias veces como fraude.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <section id="como-funciona">
+    <div class="wrap">
+      <h2>Cómo funciona</h2>
+      <ol class="steps">
+        <li><b>Copia lo que te pidieron.</b>Puede ser un enlace de WhatsApp, un número de celular o una cuenta para transferir.</li>
+        <li><b>Pégalo en AlertaPhishing.</b>El sistema lo compara con los reportes de otras personas y con fuentes de amenazas conocidas.</li>
+        <li><b>Lee el resultado y decide.</b>Recibes un nivel de riesgo y una explicación en palabras sencillas.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="que-verificar">
+    <div class="wrap">
+      <h2>Qué puedes verificar</h2>
+      <div class="what">
+        <div><h3>Enlaces</h3><p>Los que llegan por mensaje, correo o redes sociales y dicen venir de tu banco.</p></div>
+        <div><h3>Números de celular</h3><p>Los de Yape, Plin o los de una llamada que te pide datos.</p></div>
+        <div><h3>Cuentas interbancarias</h3><p>Revisa el CCI de 20 dígitos antes de enviar dinero.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="familia">
+    <div class="wrap">
+      <h2>¿Cuidas a un familiar?</h2>
+      <p>Vincula su cuenta con la tuya. Si interactúa con algo de riesgo alto, recibes un aviso para llamarlo a tiempo.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Proyecto académico del curso SI720 Diseño y Patrones de Software, UPC.<br>
+    Código del servicio de verificación: <a href="https://github.com/renzo1106/alertaphishing-servicios">github.com/renzo1106/alertaphishing-servicios</a></p>
+  </div>
+</footer>
+</body>
+</html>
