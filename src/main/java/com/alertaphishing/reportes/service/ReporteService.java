@@ -1,4 +1,3 @@
-
 package com.alertaphishing.reportes.service;
 
 import com.alertaphishing.reportes.dto.RegistrarReporteRequest;
@@ -14,55 +13,66 @@ import java.util.UUID;
 @Service
 public class ReporteService {
 
-    private final ReporteRepository repositorio;
+    private final ReporteRepository reporteRepository;
 
-    public ReporteService(ReporteRepository repositorio) {
-        this.repositorio = repositorio;
+    public ReporteService(ReporteRepository reporteRepository) {
+        this.reporteRepository = reporteRepository;
     }
 
-    public ReporteResponse registrar(
-            RegistrarReporteRequest request) {
+    public ReporteResponse registrar(RegistrarReporteRequest request) {
 
         Reporte reporte = new Reporte(
                 request.reportanteId(),
                 request.tipoDato(),
                 request.datoReportado(),
-                request.descripcion()
+                request.descripcion(),
+                request.latitud(),
+                request.longitud()
         );
 
-        return convertirRespuesta(repositorio.guardar(reporte));
+        Reporte reporteGuardado = reporteRepository.guardar(reporte);
+
+        return convertirRespuesta(reporteGuardado);
     }
 
     public List<ReporteResponse> listarTodos() {
-        return repositorio.listarTodos()
+
+        return reporteRepository.listarTodos()
                 .stream()
                 .map(this::convertirRespuesta)
                 .toList();
     }
 
     public ReporteResponse buscarPorId(UUID id) {
-        Reporte reporte = repositorio.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "No se encontró el reporte"));
+
+        Reporte reporte = reporteRepository.buscarPorId(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("No se encontró el reporte con ID: " + id)
+                );
 
         return convertirRespuesta(reporte);
     }
 
-    public ReporteResponse calificar(
-            UUID id, boolean veraz) {
+    public ReporteResponse calificar(UUID id, boolean veraz) {
 
-        Reporte reporte = repositorio.buscarPorId(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "No se encontró el reporte"));
+        Reporte reporte = reporteRepository.buscarPorId(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("No se encontró el reporte con ID: " + id)
+                );
 
-        reporte.cambiarEstado(
-                veraz ? EstadoReporte.VALIDADO : EstadoReporte.RECHAZADO
-        );
+        if (veraz) {
+            reporte.cambiarEstado(EstadoReporte.VALIDADO);
+        } else {
+            reporte.cambiarEstado(EstadoReporte.RECHAZADO);
+        }
+
+        reporteRepository.guardar(reporte);
 
         return convertirRespuesta(reporte);
     }
 
     private ReporteResponse convertirRespuesta(Reporte reporte) {
+
         return new ReporteResponse(
                 reporte.getId(),
                 reporte.getReportanteId(),
@@ -70,7 +80,9 @@ public class ReporteService {
                 reporte.getDatoReportado(),
                 reporte.getDescripcion(),
                 reporte.getEstado().name(),
-                reporte.getFechaRegistro()
+                reporte.getFechaRegistro(),
+                reporte.getLatitud(),
+                reporte.getLongitud()
         );
     }
 }

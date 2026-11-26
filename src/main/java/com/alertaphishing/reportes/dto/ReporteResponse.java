@@ -10,5 +10,7 @@ public record ReporteResponse(
         String datoReportado,
         String descripcion,
         String estado,
-        LocalDateTime fechaRegistro
+        LocalDateTime fechaRegistro,
+        Double latitud,
+        Double longitud
 ) {}
