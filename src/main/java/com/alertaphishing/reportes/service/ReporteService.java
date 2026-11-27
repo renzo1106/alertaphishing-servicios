@@ -5,6 +5,11 @@ import com.alertaphishing.reportes.dto.ReporteResponse;
 import com.alertaphishing.reportes.model.EstadoReporte;
 import com.alertaphishing.reportes.model.Reporte;
 import com.alertaphishing.reportes.repository.ReporteRepository;
+
+import com.alertaphishing.notificaciones.dto.CrearNotificacionRequest;
+import com.alertaphishing.notificaciones.model.TipoNotificacion;
+import com.alertaphishing.notificaciones.service.NotificacionService;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +19,13 @@ import java.util.UUID;
 public class ReporteService {
 
     private final ReporteRepository reporteRepository;
+    private final NotificacionService notificacionService;
 
-    public ReporteService(ReporteRepository reporteRepository) {
+    public ReporteService(
+            ReporteRepository reporteRepository,
+            NotificacionService notificacionService) {
         this.reporteRepository = reporteRepository;
+        this.notificacionService = notificacionService;
     }
 
     public ReporteResponse registrar(RegistrarReporteRequest request) {
@@ -31,6 +40,15 @@ public class ReporteService {
         );
 
         Reporte reporteGuardado = reporteRepository.guardar(reporte);
+
+        notificacionService.crearNotificacion(
+                new CrearNotificacionRequest(
+                        request.reportanteId(),
+                        TipoNotificacion.GENERAL,
+                        "Reporte recibido",
+                        "Tu reporte comunitario ha sido registrado correctamente."
+                )
+        );
 
         return convertirRespuesta(reporteGuardado);
     }
@@ -47,7 +65,8 @@ public class ReporteService {
 
         Reporte reporte = reporteRepository.buscarPorId(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("No se encontró el reporte con ID: " + id)
+                        new IllegalArgumentException(
+                                "No se encontró el reporte con ID: " + id)
                 );
 
         return convertirRespuesta(reporte);
@@ -57,7 +76,8 @@ public class ReporteService {
 
         Reporte reporte = reporteRepository.buscarPorId(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("No se encontró el reporte con ID: " + id)
+                        new IllegalArgumentException(
+                                "No se encontró el reporte con ID: " + id)
                 );
 
         if (veraz) {
@@ -67,6 +87,23 @@ public class ReporteService {
         }
 
         reporteRepository.guardar(reporte);
+
+        String titulo = veraz
+                ? "Reporte validado"
+                : "Reporte rechazado";
+
+        String mensaje = veraz
+                ? "Tu reporte comunitario ha sido validado correctamente."
+                : "Tu reporte comunitario ha sido rechazado.";
+
+        notificacionService.crearNotificacion(
+                new CrearNotificacionRequest(
+                        reporte.getReportanteId(),
+                        TipoNotificacion.GENERAL,
+                        titulo,
+                        mensaje
+                )
+        );
 
         return convertirRespuesta(reporte);
     }
