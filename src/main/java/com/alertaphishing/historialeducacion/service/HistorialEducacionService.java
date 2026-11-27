@@ -27,7 +27,6 @@ public class HistorialEducacionService {
                         request.usuarioId(),
                         request.tipoDato(),
                         request.datoConsultado(),
-                        request.scoreRiesgo(),
                         request.nivelRiesgo(),
                         request.resultado()
                 );
@@ -90,7 +89,6 @@ public class HistorialEducacionService {
                 historial.getUsuarioId(),
                 historial.getTipoDato().name(),
                 historial.getDatoConsultado(),
-                historial.getScoreRiesgo(),
                 historial.getNivelRiesgo(),
                 historial.getResultado(),
                 historial.getFechaVerificacion()

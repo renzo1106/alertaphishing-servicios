@@ -9,7 +9,6 @@ public class HistorialVerificacion {
     private final UUID usuarioId;
     private final TipoDatoVerificado tipoDato;
     private final String datoConsultado;
-    private final int scoreRiesgo;
     private final String nivelRiesgo;
     private final String resultado;
     private final LocalDateTime fechaVerificacion;
@@ -18,7 +17,6 @@ public class HistorialVerificacion {
             UUID usuarioId,
             TipoDatoVerificado tipoDato,
             String datoConsultado,
-            int scoreRiesgo,
             String nivelRiesgo,
             String resultado) {
 
@@ -32,11 +30,6 @@ public class HistorialVerificacion {
                     "El dato consultado es obligatorio");
         }
 
-        if (scoreRiesgo < 0 || scoreRiesgo > 100) {
-            throw new IllegalArgumentException(
-                    "El score debe estar entre 0 y 100");
-        }
-
         if (nivelRiesgo == null || nivelRiesgo.isBlank()
                 || resultado == null || resultado.isBlank()) {
             throw new IllegalArgumentException(
@@ -47,7 +40,6 @@ public class HistorialVerificacion {
         this.usuarioId = usuarioId;
         this.tipoDato = tipoDato;
         this.datoConsultado = datoConsultado;
-        this.scoreRiesgo = scoreRiesgo;
         this.nivelRiesgo = nivelRiesgo;
         this.resultado = resultado;
         this.fechaVerificacion = LocalDateTime.now();
@@ -67,10 +59,6 @@ public class HistorialVerificacion {
 
     public String getDatoConsultado() {
         return datoConsultado;
-    }
-
-    public int getScoreRiesgo() {
-        return scoreRiesgo;
     }
 
     public String getNivelRiesgo() {

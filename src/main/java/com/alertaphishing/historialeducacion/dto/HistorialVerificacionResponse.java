@@ -8,7 +8,6 @@ public record HistorialVerificacionResponse(
         UUID usuarioId,
         String tipoDato,
         String datoConsultado,
-        int scoreRiesgo,
         String nivelRiesgo,
         String resultado,
         LocalDateTime fechaVerificacion
